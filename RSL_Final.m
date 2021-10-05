@@ -1,17 +1,29 @@
 % RSL_Final calculates patterning metrics from input maps & prints them to an excel file
-
+%
 % This script takes rasterized maps of Everglades ridge-slough landscapes, 
 % converts them to a binary representation and performs numerous
 % statistical analyses on the spatial characteristics.
-
+%
 % If running the map making section of this script, the inputs are a series
 % of raw rasterized maps with multiple vegetation classes as a .txt file,
 % or if not running the map making section, the inputs are binary maps
 % saved as .mat files
-
+%
+% Maps provided with this script were produced by the South Florida Water 
+% Management District (Rutchey et al. 2005)
+%
 % This is the primary script used for the analysis presented in Casey et.
 % al. 2015, however distribution testing and frequency analysis are both
 % accomplished in separate scripts.
+%
+% References:
+% Casey, Stephen T., et al. "Hydrologic controls on aperiodic spatial 
+% organization of the ridge–slough patterned landscape." Hydrology and 
+% Earth System Sciences 20.11 (2016): 4457-4467.
+%
+% Rutchey, K., Vilchek, L., and Love, M.: Development of a vegetation map for Water Conservation Area 3, Technical Publication
+% ERA Number 421, South Florida Water Management District,
+% West Palm Beach, FL, USA, 2005.
 
 
 %%  Map Making
