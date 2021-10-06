@@ -1,5 +1,4 @@
 % Periodogram (Radial & Angular Spectrum) Analysis for Images
-
 clear
 clc
 
@@ -7,8 +6,8 @@ map_n=33;
 analysisname='1995';
 filedirectory=['C:\Users\thorn\OneDrive\Desktop\RSL_Github\RSL\RSL\' analysisname];
 
-allangles=1;    % Omnidirectional R-Spectrum = 1; Horizontal R-Spectrum = 0
-                % A-Specrum is only computed for omnidirectional case
+allangles=1;    % omnidirectional=1; horizontal=0
+                % Angular Spectrum is only computed for omnidirectional case
 
 orientation=zeros(map_n,1);
 c=zeros(map_n,1);
@@ -16,18 +15,22 @@ c=zeros(map_n,1);
 excelfilename= [filedirectory '\FourierTransform\rspectrum_test.xlsx'];
 delete(excelfilename)
 
-for mapn=2:map_n
+for mapn=1:map_n
 clearvars -except excelfilename c mapn filedirectory map_n orientation allangles
 filename=[filedirectory '\Maps\1995all' int2str(mapn) '.mat'];
 load(filename)
 
 data=ismember(data,[1 2 3]);
 
-data(1,:)=[];
-data(:,1)=[];
-
+% Ensure equal length & width
 smalldim=min(size(data));
 data=data(1:smalldim,1:smalldim);
+
+% Make size odd (so there is one central pixel)
+if ~rem(length(data),2)
+    data(1,:)=[];
+    data(:,1)=[];
+end
 
 b_length=length(data);
 z=b_length/2;
@@ -35,17 +38,13 @@ in=(0:1:z);
 [x,y]=meshgrid(in,in);
 distance=sqrt(x.^2+y.^2);
 sort_distance=sort(distance(:));
-distance(distance>z-1)=z-1;
 distance=[fliplr(distance) distance(:,2:end)];
 distance=[flipud(distance);distance(2:end,:)];
 
-% Make extent circular for A-Spectrum
-if allangles==1
-    distance2=distance-(z-2);
-    distance2(distance2<0)=0;
-    data(data==1)=data(data==1)-.5*distance2(data==1)./max(distance2(:));
-    data(data==0)=data(data==0)+.5*distance2(data==0)./max(distance2(:));
-end
+% Map extent must be circular so image boundary doesn't bias
+circularimage=zeros(b_length,b_length);
+circularimage(distance<=z)=1;
+data=data.*circularimage;
 
 cell_angle=rot90(atan(y./x).*180/pi);
 cell_angle=[cell_angle;90+rot90(cell_angle(:,2:end),3)];
@@ -54,8 +53,10 @@ cell_angle=[rot90(cell_angle(:,2:end),2) cell_angle];
 cell_angle(distance>=b_length/2)=nan;
 
 b=fftshift(fft2(data));
+b=b.*circularimage;   % make extent circular
 b_log=log(abs(b));
 
+% R-spectrum
 n1=1;
 n=1;
 r_spectrum=zeros((b_length+1)/2,1);
@@ -98,7 +99,7 @@ excel_index = [idx2A1(mapn) '2'];
 xlswrite(excelfilename,r_spectrum,'r_spectrum',excel_index);
 disp(mapn)
 
-% A-Spectrum
+% Angular Spectrum
 if allangles == 1
     a_spectrum=zeros(180,1);
     a_spectrum(1)=mean(log(abs(b(cell_angle>=179.5 | cell_angle < .5))));
@@ -108,11 +109,11 @@ if allangles == 1
         n1=n1+1;
     end
     figure(3)
-    plot(0:1:359,[a_spectrum;a_spectrum])
-    title('S-Spectrum')
+    plot(0:179,a_spectrum)
+    title('Angular-Spectrum')
     xlabel('Angle (degrees)')
     ylabel('Amplitude')
-    % Max A-Spectrum indicates orientation of landscape
+    % Max angular-spectrum indicates orientation of landscape
     orientation(mapn)=find(max(a_spectrum)==a_spectrum)-1;
 end
 
