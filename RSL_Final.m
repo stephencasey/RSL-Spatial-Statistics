@@ -49,7 +49,7 @@ makemap=0;          % Run entire map making section or use saved maps (1=yes 0=n
 pixelsize=pixelsize/scale;
 % Sets the file directory
 analysisname='1995';
-filedirectory=['C:\Users\thorn\OneDrive\Desktop\RSL_Github\' analysisname '\'];
+filedirectory=['C:\Users\thorn\OneDrive\Desktop\RSL_Github\RSL\RSL\' analysisname '\'];
 % Set the base filename for the new maps
 mapname='1995all';   
 
@@ -494,6 +494,7 @@ for site=1:mapn
     lridge_ti=0;
     for j=1:rangex
         zeta=bwlabel(data_r(:,j))';
+        error
         zeta_c=c(:,j);
         [~, first1]=unique(zeta,'first');
         first1(1)=[];
